@@ -1070,7 +1070,7 @@ const handleAdoptionSubmit = async (event) => {
 
         </section>
 
-        <section className="stats-section">
+        <section style={{ backgroundColor: '#f2efe4ff', borderRadius: '10px' }} className="stats-section">
           <div className="stats-heading">
             <span className="section-eyebrow">OUR IMPACT</span>
             <h2>Every Paw Counts 💛</h2>
@@ -1279,7 +1279,7 @@ const handleAdoptionSubmit = async (event) => {
                 aria-label="Facebook"
                 title="Facebook"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg style={{ stroke: '#1877F2' }} viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M14 21v-8h3l.5-4H14V7c0-1.2.4-2 2-2h2V1.4C17.3 1.2 16.2 1 15 1c-3.1 0-5 1.9-5 5.4V9H7v4h3v8z" />
                 </svg>
               </a>
@@ -1291,7 +1291,7 @@ const handleAdoptionSubmit = async (event) => {
                 aria-label="Instagram"
                 title="Instagram"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg style={{ stroke: '#ea60b7ff' }} viewBox="0 0 24 24" aria-hidden="true">
                   <rect x="3" y="3" width="18" height="18" rx="5" />
                   <circle cx="12" cy="12" r="4" />
                   <circle cx="17.5" cy="6.5" r="1" />
@@ -1305,7 +1305,7 @@ const handleAdoptionSubmit = async (event) => {
                 aria-label="YouTube"
                 title="YouTube"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg style={{ stroke: '#e64848ff' }} viewBox="0 0 24 24" aria-hidden="true">
                   <rect x="2" y="5" width="20" height="14" rx="4" />
                   <path d="m10 9 5 3-5 3z" />
                 </svg>
