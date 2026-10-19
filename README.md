@@ -14,7 +14,13 @@ A web application that allows users to browse pets available for adoption and su
 - Admin management of pets and adoption requests
 - Django REST Framework API
 - Favorite pets (if implemented)
+## Live Demo
 
+### YouTube Project Walkthrough
+
+[![Pet Adoption & Rescue Platform - Live View](https://img.youtube.com/vi/zP4zvyS6b2M/maxresdefault.jpg)](https://youtu.be/zP4zvyS6b2M)
+
+[▶ Watch the Project on YouTube](https://youtu.be/zP4zvyS6b2M)
 ## Tech Stack
 
 **Backend:** Python, Django, Django REST Framework  
