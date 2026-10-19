@@ -23,7 +23,7 @@ class AdoptionRequest(models.Model):
     address = models.TextField()
     phone = models.CharField(max_length=20)
     reason = models.TextField()
-    previous_pet_experience = models.BooleanField()
+    previous_pet_experience = models.TextField(blank=True)
     message = models.TextField(blank=True)
     status = models.CharField(
         max_length=20,

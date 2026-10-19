@@ -156,3 +156,12 @@ export function deletePet(id) {
     method: 'DELETE',
   });
 }
+export function submitAdoptionRequest(adoptionData) {
+  return apiRequest('/adoptions/', {
+    method: 'POST',
+    body: JSON.stringify(adoptionData),
+  })
+}
+export function getMyAdoptionRequests() {
+  return apiRequest('/adoptions/');
+}

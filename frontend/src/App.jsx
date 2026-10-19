@@ -13,6 +13,8 @@ import {
   logoutUser,
   getProfile,
   updateProfile,
+  submitAdoptionRequest,
+  getMyAdoptionRequests,
 } from './api'
 
 
@@ -98,6 +100,10 @@ const [adoptionForm, setAdoptionForm] = useState({
   previous_pet_experience: '',
   message: '',
 })
+
+const [myAdoptionRequests, setMyAdoptionRequests] = useState([]);
+const [adoptionRequestsLoading, setAdoptionRequestsLoading] = useState(false);
+const [adoptionRequestsError, setAdoptionRequestsError] = useState('');
 
   useEffect(() => {
     let cancelled = false
@@ -295,30 +301,53 @@ const handleAuthSubmit = async (event) => {
   }
 }
 
-
 const handleOpenProfile = async () => {
-  setProfileError('')
-  setProfileMessage('')
-  setProfileEditing(false)
-  setProfileLoading(true)
+  setProfileError('');
+  setProfileMessage('');
+  setProfileEditing(false);
+  setProfileLoading(true);
+
+  setAdoptionRequestsLoading(true);
+  setAdoptionRequestsError('');
+
+  setAuthMode('profile');
 
   try {
-    const data = await getProfile()
+    const data = await getProfile();
 
-    setProfile(data)
+    setProfile(data);
     setProfileForm({
       first_name: data.first_name || '',
       last_name: data.last_name || '',
       email: data.email || '',
-    })
-
-    setAuthMode('profile')
+    });
   } catch (error) {
-    setProfileError(error.message || 'Could not load profile.')
+    setProfileError(error.message || 'Could not load profile.');
   } finally {
-    setProfileLoading(false)
+    setProfileLoading(false);
   }
+
+  try {
+  const response = await getMyAdoptionRequests();
+
+  console.log('Adoption API response:', response);
+
+  setMyAdoptionRequests(
+    Array.isArray(response)
+      ? response
+      : Array.isArray(response?.results)
+        ? response.results
+        : []
+  );
+} catch (error) {
+  setAdoptionRequestsError(
+    error.message || 'Could not load adoption requests.'
+  );
+} finally {
+  setAdoptionRequestsLoading(false);
 }
+};
+
 
 const handleSaveProfile = async (event) => {
   event.preventDefault()
@@ -351,6 +380,49 @@ const handleAdoptionChange = (event) => {
     ...previous,
     [name]: value,
   }))
+}
+
+const [adoptionLoading, setAdoptionLoading] = useState(false)
+const [adoptionError, setAdoptionError] = useState('')
+const [adoptionMessage, setAdoptionMessage] = useState('')
+
+const handleAdoptionSubmit = async (event) => {
+  event.preventDefault()
+
+  if (!selectedPet || adoptionLoading) return
+
+  setAdoptionError('')
+  setAdoptionMessage('')
+  setAdoptionLoading(true)
+
+  try {
+    await submitAdoptionRequest({
+      pet: selectedPet.id,
+      address: adoptionForm.address,
+      phone: adoptionForm.phone,
+      reason: adoptionForm.reason,
+      previous_pet_experience: adoptionForm.previous_pet_experience,
+      message: adoptionForm.message,
+    })
+
+    setAdoptionMessage(
+      `Your adoption request for ${selectedPet.name} was submitted successfully!`
+    )
+
+    setAdoptionForm({
+      address: '',
+      phone: '',
+      reason: '',
+      previous_pet_experience: '',
+      message: '',
+    })
+  } catch (error) {
+    setAdoptionError(
+      error.message || 'Could not submit the adoption request.'
+    )
+  } finally {
+    setAdoptionLoading(false)
+  }
 }
 
   return (
@@ -429,220 +501,251 @@ const handleAdoptionChange = (event) => {
 
 
 
-{authMode && (
-  <div
-    className="auth-modal-overlay"
-    onClick={() => setAuthMode('')}
-  >
-    <section
-      className="auth-section"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="auth-title"
-      onClick={(event) => event.stopPropagation()}
-    >
-      <button
-        type="button"
-        className="auth-close-btn"
-        onClick={() => setAuthMode('')}
-        aria-label="Close popup"
-      >
-        ×
-      </button>
-
-      <h2 id="auth-title">
-        {authMode === 'profile'
-          ? 'My Profile'
-          : authMode === 'login'
-            ? 'Welcome Back'
-            : 'Create Your Account'}
-      </h2>
-
-      
-{authMode === 'profile' ? (
-  <>
-    {profileLoading && <p>Loading profile...</p>}
-
-    {profileError && (
-      <p className="favorite-error">{profileError}</p>
-    )}
-
-    {profileMessage && <p>{profileMessage}</p>}
-
-    {profile && !profileLoading && (
-      profileEditing ? (
-        <form onSubmit={handleSaveProfile}>
-          <label>Username</label>
-          <input
-            value={profile.username || ''}
-            disabled
-          />
-
-          <label>First Name</label>
-          <input
-            name="first_name"
-            value={profileForm.first_name}
-            onChange={(event) =>
-              setProfileForm({
-                ...profileForm,
-                first_name: event.target.value,
-              })
-            }
-          />
-
-          <label>Last Name</label>
-          <input
-            name="last_name"
-            value={profileForm.last_name}
-            onChange={(event) =>
-              setProfileForm({
-                ...profileForm,
-                last_name: event.target.value,
-              })
-            }
-          />
-
-          <label>Email</label>
-          <input
-            name="email"
-            type="email"
-            value={profileForm.email}
-            onChange={(event) =>
-              setProfileForm({
-                ...profileForm,
-                email: event.target.value,
-              })
-            }
-            required
-          />
-
-          <button type="submit" disabled={profileLoading}>
-            {profileLoading ? 'Saving...' : 'Save Changes'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setProfileEditing(false)
-              setProfileError('')
-              setProfileForm({
-                first_name: profile.first_name || '',
-                last_name: profile.last_name || '',
-                email: profile.email || '',
-              })
-            }}
+      {authMode && (
+        <div
+          className="auth-modal-overlay"
+          onClick={() => setAuthMode('')}
+        >
+          <section
+            className="auth-section"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-title"
+            onClick={(event) => event.stopPropagation()}
           >
-            Cancel
-          </button>
-        </form>
-      ) : (
-        <div className="profile-details">
-          <p><strong>Username:</strong> {profile.username}</p>
-          <p><strong>First Name:</strong> {profile.first_name || 'Not added'}</p>
-          <p><strong>Last Name:</strong> {profile.last_name || 'Not added'}</p>
-          <p><strong>Email:</strong> {profile.email || 'Not added'}</p>
+            <button
+              type="button"
+              className="auth-close-btn"
+              onClick={() => setAuthMode('')}
+              aria-label="Close popup"
+            >
+              ×
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setProfileError('')
-              setProfileMessage('')
-              setProfileEditing(true)
-            }}
-          >
-            Edit Profile
-          </button>
-        </div>
-      )
-    )}
-  </>
-) : (
-  <>
-    {authError && (
-      <p className="favorite-error">{authError}</p>
-    )}
+            <h2 id="auth-title">
+              {authMode === 'profile'
+                ? 'My Profile'
+                : authMode === 'login'
+                  ? 'Welcome Back'
+                  : 'Create Your Account'}
+            </h2>
 
-    {authMessage && <p>{authMessage}</p>}
-
-    <form onSubmit={handleAuthSubmit}>
-      {authMode === 'signup' && (
+            
+      {authMode === 'profile' ? (
         <>
-          <input
-            name="first_name"
-            placeholder="First name"
-            value={authForm.first_name}
-            onChange={handleAuthChange}
-            required
-          />
+          {profileLoading && <p>Loading profile...</p>}
 
-          <input
-            name="last_name"
-            placeholder="Last name"
-            value={authForm.last_name}
-            onChange={handleAuthChange}
-            required
-          />
+          {profileError && (
+            <p className="favorite-error">{profileError}</p>
+          )}
 
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={authForm.email}
-            onChange={handleAuthChange}
-            required
-          />
+          {profileMessage && <p>{profileMessage}</p>}
+
+          {profile && !profileLoading && (
+            profileEditing ? (
+              <form onSubmit={handleSaveProfile}>
+                <label>Username</label>
+                <input
+                  value={profile.username || ''}
+                  disabled
+                />
+
+                <label>First Name</label>
+                <input
+                  name="first_name"
+                  value={profileForm.first_name}
+                  onChange={(event) =>
+                    setProfileForm({
+                      ...profileForm,
+                      first_name: event.target.value,
+                    })
+                  }
+                />
+
+                <label>Last Name</label>
+                <input
+                  name="last_name"
+                  value={profileForm.last_name}
+                  onChange={(event) =>
+                    setProfileForm({
+                      ...profileForm,
+                      last_name: event.target.value,
+                    })
+                  }
+                />
+
+                <label>Email</label>
+                <input
+                  name="email"
+                  type="email"
+                  value={profileForm.email}
+                  onChange={(event) =>
+                    setProfileForm({
+                      ...profileForm,
+                      email: event.target.value,
+                    })
+                  }
+                  required
+                />
+
+                <button type="submit" disabled={profileLoading}>
+                  {profileLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileEditing(false)
+                    setProfileError('')
+                    setProfileForm({
+                      first_name: profile.first_name || '',
+                      last_name: profile.last_name || '',
+                      email: profile.email || '',
+                    })
+                  }}
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              <div className="profile-details">
+                <p><strong>Username:</strong> {profile.username}</p>
+                <p><strong>First Name:</strong> {profile.first_name || 'Not added'}</p>
+                <p><strong>Last Name:</strong> {profile.last_name || 'Not added'}</p>
+                <p><strong>Email:</strong> {profile.email || 'Not added'}</p>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileError('')
+                    setProfileMessage('')
+                    setProfileEditing(true)
+                  }}
+                >
+                  Edit Profile
+                </button>
+              </div>
+            )
+          )}
+          <section className="my-adoption-requests">
+          <h3>My Adoption Requests</h3>
+
+          {adoptionRequestsLoading && <p>Loading requests...</p>}
+
+          {adoptionRequestsError && (
+            <p className="error-message">{adoptionRequestsError}</p>
+          )}
+
+          {!adoptionRequestsLoading &&
+            !adoptionRequestsError &&
+            myAdoptionRequests.length === 0 && (
+              <p>You haven't submitted any adoption requests yet.</p>
+            )}
+
+          {myAdoptionRequests.map((request) => (
+            <div className="adoption-request-card" key={request.id}>
+              <h4>{request.pet_name}</h4>
+              <p>
+                Submitted:{' '}
+                {new Date(request.created_at).toLocaleDateString()}
+              </p>
+              <p>
+                Status:{' '}
+                <strong className={`status-${request.status.toLowerCase()}`}>
+                  {request.status}
+                </strong>
+              </p>
+            </div>
+          ))}
+        </section>
+        </>
+      ) : (
+        <>
+          {authError && (
+            <p className="favorite-error">{authError}</p>
+          )}
+
+          {authMessage && <p>{authMessage}</p>}
+
+          <form onSubmit={handleAuthSubmit}>
+            {authMode === 'signup' && (
+              <>
+                <input
+                  name="first_name"
+                  placeholder="First name"
+                  value={authForm.first_name}
+                  onChange={handleAuthChange}
+                  required
+                />
+
+                <input
+                  name="last_name"
+                  placeholder="Last name"
+                  value={authForm.last_name}
+                  onChange={handleAuthChange}
+                  required
+                />
+
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  value={authForm.email}
+                  onChange={handleAuthChange}
+                  required
+                />
+              </>
+            )}
+
+            <input
+              name="username"
+              placeholder="Username"
+              value={authForm.username}
+              onChange={handleAuthChange}
+              required
+            />
+
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={authForm.password}
+              onChange={handleAuthChange}
+              minLength={8}
+              required
+            />
+
+            <button type="submit" disabled={authLoading}>
+              {authLoading
+                ? 'Please wait...'
+                : authMode === 'login'
+                  ? 'Login'
+                  : 'Create Account'}
+            </button>
+          </form>
+
+          <p>
+            {authMode === 'login'
+              ? "Don't have an account? "
+              : 'Already have an account? '}
+
+            <button
+              type="button"
+              onClick={() => {
+                setAuthMode(authMode === 'login' ? 'signup' : 'login')
+                setAuthError('')
+                setAuthMessage('')
+              }}
+            >
+              {authMode === 'login' ? 'Sign Up' : 'Login'}
+            </button>
+          </p>
         </>
       )}
 
-      <input
-        name="username"
-        placeholder="Username"
-        value={authForm.username}
-        onChange={handleAuthChange}
-        required
-      />
-
-      <input
-        name="password"
-        type="password"
-        placeholder="Password"
-        value={authForm.password}
-        onChange={handleAuthChange}
-        minLength={8}
-        required
-      />
-
-      <button type="submit" disabled={authLoading}>
-        {authLoading
-          ? 'Please wait...'
-          : authMode === 'login'
-            ? 'Login'
-            : 'Create Account'}
-      </button>
-    </form>
-
-    <p>
-      {authMode === 'login'
-        ? "Don't have an account? "
-        : 'Already have an account? '}
-
-      <button
-        type="button"
-        onClick={() => {
-          setAuthMode(authMode === 'login' ? 'signup' : 'login')
-          setAuthError('')
-          setAuthMessage('')
-        }}
-      >
-        {authMode === 'login' ? 'Sign Up' : 'Login'}
-      </button>
-    </p>
-  </>
-)}
-
-    </section>
-  </div>
-)}
+          </section>
+        </div>
+      )}
 
 
 
@@ -1056,10 +1159,24 @@ const handleAdoptionChange = (event) => {
             <h2 id="adoption-title">Adopt {selectedPet.name}</h2>
             <p>Tell us a little about yourself and your home.</p>
 
-            <form onSubmit={(event) => {
-              event.preventDefault()
-              // Submission will be connected to the backend in the next step.
-            }}>
+            {adoptionMessage && (
+              <div className="adoption-success" role="status">
+                <h3>Request Submitted Successfully!</h3>
+                <p>{adoptionMessage}</p>
+                <button
+                  type="button"
+                  className="adopt-btn"
+                  onClick={() => {
+                    setAdoptionMessage('')
+                    setSelectedPet(null)
+                  }}
+                >
+                  Done
+                </button>
+              </div>
+            )}
+
+            <form onSubmit={handleAdoptionSubmit}>
               <label htmlFor="adoption-address">Your Address</label>
               <input
                 id="adoption-address"
@@ -1111,21 +1228,32 @@ const handleAdoptionChange = (event) => {
                 onChange={handleAdoptionChange}
               />
 
-              <button type="submit" className="adopt-btn">
-                Submit Adoption Request
+              {adoptionError && (
+                <p className="favorite-error">{adoptionError}</p>
+              )}
+
+              {adoptionMessage && (
+                <p>{adoptionMessage}</p>
+              )}
+
+              <button
+                type="submit"
+                className="adopt-btn"
+                disabled={adoptionLoading}
+              >
+                {adoptionLoading
+                  ? 'Submitting...'
+                  : 'Submit Adoption Request'}
               </button>
             </form>
           </section>
         </div>
       )}
-
-
       </main>
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-brand">
             <a className="brand" href="#">
-              <span className="brand-icon">🐾</span>
               <span>PetAdopt</span>
             </a>
             <p>Every pet deserves a loving home. 💛</p>
@@ -1137,7 +1265,7 @@ const handleAdoptionChange = (event) => {
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 5h18v14H3z M3 6l9 7 9-7" />
               </svg>
-              <span>your-email@example.com</span>
+              <span>email@example.com</span>
             </a>
           </div>
 
