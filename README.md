@@ -20,7 +20,7 @@ A web application that allows users to browse pets available for adoption and su
 
 [![Pet Adoption & Rescue Platform - Live View]
 
-[▶ Watch the Project on YouTube](https://youtu.be/zP4zvyS6b2M)
+[▶ Watch the Project on YouTube]
 ## Tech Stack
 
 **Backend:** Python, Django, Django REST Framework  
