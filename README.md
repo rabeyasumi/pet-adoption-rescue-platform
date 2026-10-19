@@ -18,7 +18,7 @@ A web application that allows users to browse pets available for adoption and su
 
 ### YouTube Project Walkthrough
 
-[![Pet Adoption & Rescue Platform - Live View](https://img.youtube.com/vi/zP4zvyS6b2M/maxresdefault.jpg)](https://youtu.be/zP4zvyS6b2M)
+[![Pet Adoption & Rescue Platform - Live View]
 
 [▶ Watch the Project on YouTube](https://youtu.be/zP4zvyS6b2M)
 ## Tech Stack
