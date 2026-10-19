@@ -90,6 +90,14 @@ const [profileMessage, setProfileMessage] = useState('')
 const [profileEditing, setProfileEditing] = useState(false)
 const [profileLoading, setProfileLoading] = useState(false)
 
+const [selectedPet, setSelectedPet] = useState(null)
+const [adoptionForm, setAdoptionForm] = useState({
+  address: '',
+  phone: '',
+  reason: '',
+  previous_pet_experience: '',
+  message: '',
+})
 
   useEffect(() => {
     let cancelled = false
@@ -335,6 +343,14 @@ const handleSaveProfile = async (event) => {
   } finally {
     setProfileLoading(false)
   }
+}
+const handleAdoptionChange = (event) => {
+  const { name, value } = event.target
+
+  setAdoptionForm((previous) => ({
+    ...previous,
+    [name]: value,
+  }))
 }
 
   return (
@@ -723,7 +739,7 @@ const handleSaveProfile = async (event) => {
           {!petsLoading && !petsError && pets.length === 0 && (
             <p>No pets found. Try another search.</p>
           )}
-          
+
           <div className="pet-grid">
             {pets.map((pet) => (
               <article className="pet-card" key={pet.id}>
@@ -754,7 +770,20 @@ const handleSaveProfile = async (event) => {
                 <div className="pet-info">
                   <h3>{pet.name}</h3>
                   <p>{pet.type} · {pet.age}</p>
-                  <button className="adopt-btn" disabled>
+                  <button
+                    className="adopt-btn"
+                    onClick={() => {
+                      if (!localStorage.getItem('authToken')) {
+                        setAuthError('Please log in to adopt a pet.')
+                        setAuthMessage('')
+                        setAuthMode('login')
+                        return
+                      }
+
+                      // Next step: open adoption form
+                      setSelectedPet(pet)
+                    }}
+                  >
                     Adopt Me
                   </button>
                 </div>
@@ -1001,6 +1030,95 @@ const handleSaveProfile = async (event) => {
             )}
           </div>
         </section>
+
+
+      {selectedPet && (
+        <div
+          className="auth-modal-overlay"
+          onClick={() => setSelectedPet(null)}
+        >
+          <section
+            className="auth-section adoption-section"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="adoption-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="auth-close-btn"
+              onClick={() => setSelectedPet(null)}
+              aria-label="Close adoption form"
+            >
+              ×
+            </button>
+
+            <h2 id="adoption-title">Adopt {selectedPet.name}</h2>
+            <p>Tell us a little about yourself and your home.</p>
+
+            <form onSubmit={(event) => {
+              event.preventDefault()
+              // Submission will be connected to the backend in the next step.
+            }}>
+              <label htmlFor="adoption-address">Your Address</label>
+              <input
+                id="adoption-address"
+                name="address"
+                placeholder="Enter your address"
+                value={adoptionForm.address}
+                onChange={handleAdoptionChange}
+                required
+              />
+
+              <label htmlFor="adoption-phone">Phone Number</label>
+              <input
+                id="adoption-phone"
+                name="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                value={adoptionForm.phone}
+                onChange={handleAdoptionChange}
+                required
+              />
+
+              <label htmlFor="adoption-reason">Why do you want to adopt?</label>
+              <textarea
+                id="adoption-reason"
+                name="reason"
+                placeholder="Tell us why you want to adopt this pet"
+                value={adoptionForm.reason}
+                onChange={handleAdoptionChange}
+                required
+              />
+
+              <label htmlFor="adoption-experience">
+                Previous Pet Experience
+              </label>
+              <textarea
+                id="adoption-experience"
+                name="previous_pet_experience"
+                placeholder="Have you cared for pets before?"
+                value={adoptionForm.previous_pet_experience}
+                onChange={handleAdoptionChange}
+              />
+
+              <label htmlFor="adoption-message">Additional Message</label>
+              <textarea
+                id="adoption-message"
+                name="message"
+                placeholder="Anything else you want us to know?"
+                value={adoptionForm.message}
+                onChange={handleAdoptionChange}
+              />
+
+              <button type="submit" className="adopt-btn">
+                Submit Adoption Request
+              </button>
+            </form>
+          </section>
+        </div>
+      )}
+
 
       </main>
       <footer className="footer">
