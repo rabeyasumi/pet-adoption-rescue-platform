@@ -1,89 +1,259 @@
-# Pet Adoption & Rescue Platform
+# 🐾 Pet Adoption & Rescue Platform
 
-A web application that allows users to browse pets available for adoption and submit adoption requests. Administrators can manage pets and review adoption applications.
+A full-stack web application that connects pets in need of a home with people who want to adopt them. Users can explore available pets, search and filter listings, save favorites, submit adoption requests, and track their application status. Administrators can manage pets and adoption requests through Django Admin.
 
-## Features
 
-- User registration, login, logout, and profile
-- Browse pets and view pet details
-- Search and filter pets
-- Submit adoption requests
+## ✨ Features
+
+### 👤 Authentication & User Profile
+- User registration, login, and logout
+- Authenticated user profile viewing and editing
+- Protected features for authenticated users
+
+### 🐶 Pet Management & Browsing
+- Browse available pets with images and details
+- View pet name, animal type, breed, age, gender, location, description, and adoption status
+- Dedicated pet details view
+- Responsive pet cards and navigation
+
+### 🔍 Search & Filtering
+- Search pets by name and other supported search fields
+- Filter pets by animal type, breed, gender, location, and adoption status
+- Display matching results based on search and filter criteria
+
+### ❤️ Favorite Pets
+- Add pets to favorites
+- View and manage saved favorite pets
+
+### 📝 Adoption Requests
+- Submit adoption requests for available pets
+- Provide address, phone number, reason for adoption, previous pet experience, and an optional message
 - View personal adoption request history
-- Prevent adoption requests for adopted pets
-- Prevent duplicate active requests for the same pet
-- Admin management of pets and adoption requests
-- Django REST Framework API
-- Favorite pets (if implemented)
-## Live Demo
+- Track request statuses: Pending, Approved, and Rejected
 
-### YouTube Project Walkthrough
+### 🛡️ Adoption Business Logic
+- Only available pets can receive new adoption requests
+- Prevent duplicate active adoption requests from the same user for the same pet
+- When an application is approved, the pet's status changes to Adopted
+- Prevent further adoption applications for adopted pets
+- Users can access only their own adoption requests through the API
 
-[![Pet Adoption & Rescue Platform - Live View]
+### 🔧 Django Administration
+- Add, edit, and delete pet listings
+- Upload and manage pet images
+- Update pet adoption status
+- View adoption requests and applicant information
+- Approve or reject adoption applications
 
-[▶ Watch the Project on YouTube]
-## Tech Stack
+### 🌐 REST API
+- Django REST Framework API for pets and adoption requests
+- API authentication and permission controls
+- Search and filtering support
+- User-specific adoption request access
+- API pagination, if enabled in the project configuration
 
-**Backend:** Python, Django, Django REST Framework  
-**Frontend:** React, JavaScript, CSS  
-**Database:** See the configured Django database settings  
-**Authentication:** See the implemented authentication method
+## 🛠️ Technology Stack
 
-## Installation
+**Backend**
+- Python
+- Django
+- Django REST Framework
 
-1. Clone the repository.
-2. Navigate to the backend directory.
-3. Create and activate a Python virtual environment.
-4. Install the dependencies:
+**Frontend**
+- React
+- JavaScript
+- HTML5
+- CSS3
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+**Database**
+- Django-configured database
 
-5. Configure the environment variables and database settings.
-6. Apply database migrations:
+**Authentication**
+- Implemented authentication and permission system
 
-   ```bash
-   python manage.py migrate
-   ```
+## 📂 Project Structure
 
-7. Start the Django development server:
+```text
+pet-adoption-rescue-platform/
+├── backend/
+│   ├── manage.py
+│   ├── requirements.txt
+│   ├── project_config/
+│   ├── pets/
+│   ├── adoptions/
+│   ├── accounts/
+│   └── ...
+├── frontend/
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── src/
+│   └── ...
+└── README.md
+```
 
-   ```bash
-   python manage.py runserver
-   ```
+*Note: Replace example directory and app names with the actual names used in your repository.*
 
-8. For the React frontend, navigate to its directory, install the dependencies, and run the development server using the project's configured npm scripts.
+## ⚙️ Installation & Setup
 
-## API Endpoints
+### Prerequisites
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/pets/` | List pets |
-| GET | `/api/pets/<id>/` | View pet details |
-| GET | `/api/adoptions/` | List the authenticated user's requests |
-| POST | `/api/adoptions/` | Submit an adoption request |
+- Python 3
+- Node.js and npm
+- Git
 
-Additional endpoints depend on the implemented URL configuration.
+### 1. Clone the Repository
 
-## Database Migrations
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd pet-adoption-rescue-platform
+```
 
-Migration files are maintained in each Django app's `migrations/` directory.
+Replace the repository URL with your actual GitHub repository URL.
+
+### 2. Set Up the Django Backend
+
+Navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+Create and activate a virtual environment.
+
+**macOS / Linux**
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+**Windows**
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+Install the required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+Configure any required environment variables and database settings before proceeding.
+
+### 3. Apply Database Migrations
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-## Admin
+Migration files should be included in the repository. Normally, `makemigrations` is only necessary when model changes have not yet been captured in migration files.
 
-Create an administrator account if needed:
+### 4. Create an Admin Account
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Then visit `/admin/` while the Django server is running.
+Follow the prompts to create an administrator account.
 
-## Project Status
+### 5. Start the Backend Server
 
-Developed as a Django and Django REST Framework project with a React frontend.
+```bash
+python manage.py runserver
+```
+
+The default local development server address is:
+
+`http://127.0.0.1:8000/`
+
+Django Admin:
+
+`http://127.0.0.1:8000/admin/`
+
+### 6. Set Up the React Frontend
+
+Open another terminal and navigate to the frontend directory from the project root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open the local frontend URL shown in the terminal.
+
+Make sure the frontend API base URL matches the backend server address and that the backend allows requests from the frontend origin.
+
+## 🌐 API Endpoints
+
+### Pet API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/pets/` | List pets |
+| GET | `/api/pets/<id>/` | Retrieve pet details |
+| POST | `/api/pets/` | Create a pet, subject to permissions |
+| PUT | `/api/pets/<id>/` | Update a pet, subject to permissions |
+| DELETE | `/api/pets/<id>/` | Delete a pet, subject to permissions |
+
+### Adoption API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/adoptions/` | List the authenticated user's adoption requests |
+| POST | `/api/adoptions/` | Submit an adoption request |
+| GET | `/api/adoptions/<id>/` | Retrieve an authorized adoption request |
+| PUT | `/api/adoptions/<id>/` | Update a request, subject to permissions |
+
+### Search & Filtering Examples
+
+```text
+GET /api/pets/?search=golden
+GET /api/pets/?animal_type=Dog
+GET /api/pets/?gender=Male
+GET /api/pets/?page=2
+```
+
+The availability of individual filters and pagination depends on the configured API implementation.
+
+*Important: Verify endpoint paths and supported HTTP methods against the project's actual URL configuration and permissions before publishing this section.*
+
+## 🗄️ Database Models
+
+### Pet
+
+Stores pet information, including name, animal type, breed, age, gender, location, description, image, adoption status, and creation date.
+
+### AdoptionRequest
+
+Stores the requesting user, selected pet, address, phone number, reason for adoption, previous pet experience, optional message, application status, and creation date.
+
+### Relationships
+
+- One user can submit multiple adoption requests.
+- One pet can receive multiple adoption requests.
+- Each adoption request is associated with a user and a pet.
+
+## 🔒 Security & Permissions
+
+- Authentication is required for protected user actions.
+- Adoption requests are restricted to their owners where applicable.
+- Pet management operations are protected according to the configured permissions.
+
+## 📱 Responsive Design
+
+The frontend is designed to provide a usable experience across desktop, laptop, tablet, and mobile screen sizes.
+
+## 👩‍💻 Author
+
+**Your Name**
+
+- GitHub: [Your GitHub Profile](https://github.com/rabeyasumi)
+- Project Repository: [Pet Adoption & Rescue Platform](<https://github.com/rabeyasumi/pet-adoption-rescue-platform>)
+
+## 📄 License
+
+This project was developed for educational and portfolio purposes.
