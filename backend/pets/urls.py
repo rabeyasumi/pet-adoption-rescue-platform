@@ -6,6 +6,7 @@ from .views import (
     PetUpdateDeleteAPIView,
     FavoriteListCreateAPIView,
     FavoriteDeleteAPIView,
+    PetStatisticsAPIView,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path("<int:pk>/manage/", PetUpdateDeleteAPIView.as_view(), name="pet-manage"),
     path("favorites/", FavoriteListCreateAPIView.as_view(), name="favorite-list-create"),
     path("favorites/<int:pk>/", FavoriteDeleteAPIView.as_view(), name="favorite-delete"),
+    path("statistics/", PetStatisticsAPIView.as_view(), name="pet-statistics"),
 ]

@@ -8,6 +8,12 @@ from rest_framework.permissions import IsAdminUser
 from .models import Pet, Favorite
 from .serializers import PetSerializer, FavoriteSerializer
 
+from django.db.models import Count, Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from adoptions.models import AdoptionRequest
+
 
 class PetListAPIView(generics.ListAPIView):
     queryset = Pet.objects.all().order_by("-created_at")
@@ -67,3 +73,50 @@ class FavoriteDeleteAPIView(generics.DestroyAPIView):
 
     def get_queryset(self):
         return Favorite.objects.filter(user=self.request.user)
+
+class PetStatisticsAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        total_animals = Pet.objects.count()
+
+        available_animals = Pet.objects.filter(
+            status=Pet.AdoptionStatus.AVAILABLE
+        ).count()
+
+        adopted_animals = Pet.objects.filter(
+            status=Pet.AdoptionStatus.ADOPTED
+        ).count()
+
+        total_requests = AdoptionRequest.objects.count()
+
+        approved_requests = AdoptionRequest.objects.filter(
+            status=AdoptionRequest.RequestStatus.APPROVED
+        ).count()
+
+        categories = Pet.objects.values(
+            "animal_type"
+        ).annotate(
+            total=Count("id"),
+            available=Count(
+                "id",
+                filter=Q(
+                    status=Pet.AdoptionStatus.AVAILABLE
+                )
+            ),
+            adopted=Count(
+                "id",
+                filter=Q(
+                    status=Pet.AdoptionStatus.ADOPTED
+                )
+            )
+        ).order_by("animal_type")
+
+        return Response({
+            "total_animals": total_animals,
+            "available_animals": available_animals,
+            "adopted_animals": adopted_animals,
+            "total_adoption_requests": total_requests,
+            "approved_adoption_requests": approved_requests,
+            "categories": list(categories)
+        })
