@@ -1,7 +1,6 @@
-
 import './App.css'
 import './index.css'
-
+import aboutInfo from './data/aboutInfo'
 
 import {
   getPets,
@@ -25,6 +24,7 @@ import catIcon from './assets/categories/cat.png'
 import rabbitIcon from './assets/categories/rabbit.png'
 import birdIcon from './assets/categories/bird.png'
 import otherIcon from './assets/categories/other.png'
+import animalIcon from './assets/categories/animals.png'
 
 import dogPhoto from './assets/pets/dog-01.jpeg'
 import catPhoto from './assets/pets/cat-01.jpeg'
@@ -34,6 +34,7 @@ import birdPhoto from './assets/pets/bird-01.jpeg'
 import { useEffect, useState } from 'react'
 
 const categories = [
+  { name: 'All Childs', type: 'All', image: animalIcon },
   { name: 'Dogs', type: 'Dog', image: dogIcon },
   { name: 'Cats', type: 'Cat', image: catIcon },
   { name: 'Rabbits', type: 'Rabbit', image: rabbitIcon },
@@ -91,6 +92,8 @@ const [profileError, setProfileError] = useState('')
 const [profileMessage, setProfileMessage] = useState('')
 const [profileEditing, setProfileEditing] = useState(false)
 const [profileLoading, setProfileLoading] = useState(false)
+
+const [aboutPet, setAboutPet] = useState(null)
 
 const [selectedPet, setSelectedPet] = useState(null)
 const [adoptionForm, setAdoptionForm] = useState({
@@ -873,22 +876,30 @@ const handleAdoptionSubmit = async (event) => {
                 <div className="pet-info">
                   <h3>{pet.name}</h3>
                   <p>{pet.type} · {pet.age}</p>
-                  <button
-                    className="adopt-btn"
-                    onClick={() => {
-                      if (!localStorage.getItem('authToken')) {
-                        setAuthError('Please log in to adopt a pet.')
-                        setAuthMessage('')
-                        setAuthMode('login')
-                        return
-                      }
+                  <div className="pet-card-actions">
+                    <button
+                      className="adopt-btn"
+                      onClick={() => {
+                        if (!localStorage.getItem('authToken')) {
+                          setAuthError('Please log in to adopt a pet.')
+                          setAuthMessage('')
+                          setAuthMode('login')
+                          return
+                        }
 
-                      // Next step: open adoption form
-                      setSelectedPet(pet)
-                    }}
-                  >
-                    Adopt Me
-                  </button>
+                        setSelectedPet(pet)
+                      }}
+                    >
+                      Adopt Me
+                    </button>
+
+                    <button
+                      className="about-btn"
+                      onClick={() => setAboutPet(pet)}
+                    >
+                      About
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -1054,8 +1065,11 @@ const handleAdoptionSubmit = async (event) => {
                   {pet.breed && <p>{pet.breed}</p>}
                   {pet.location && <p>📍 {pet.location}</p>}
 
-                  <button className="adopt-btn" disabled>
-                    Adopt Me
+                  <button
+                    className="about-btn"
+                    onClick={() => setAboutPet(pet)}
+                  >
+                    About
                   </button>
                 </div>
               </article>
@@ -1133,7 +1147,39 @@ const handleAdoptionSubmit = async (event) => {
             )}
           </div>
         </section>
+      
 
+      {aboutPet && (
+        <div
+          className="about-modal-overlay"
+          onClick={() => setAboutPet(null)}
+        >
+          <div
+            className="about-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="about-modal-close"
+              onClick={() => setAboutPet(null)}
+            >
+              &times;
+            </button>
+
+            <div className="about-pet-content">
+              <h2>About {aboutPet.name}</h2>
+
+              <div className="about-pet-details">
+                <div>
+                  <h4>Description</h4>
+                  <p>
+                    {aboutPet.description || "More information coming soon."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedPet && (
         <div
@@ -1273,7 +1319,7 @@ const handleAdoptionSubmit = async (event) => {
             <h3>Follow Us</h3>
             <div className="social-links">
               <a
-                href="https://www.facebook.com/your-page"
+                href="#"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
@@ -1285,7 +1331,7 @@ const handleAdoptionSubmit = async (event) => {
               </a>
 
               <a
-                href="https://www.instagram.com/your-page"
+                href="#"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
@@ -1299,7 +1345,7 @@ const handleAdoptionSubmit = async (event) => {
               </a>
 
               <a
-                href="https://www.youtube.com/@your-channel"
+                href="#"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="YouTube"

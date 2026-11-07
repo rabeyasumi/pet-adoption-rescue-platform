@@ -1,6 +1,12 @@
+import uuid
+from pathlib import Path
 from django.db import models
 from django.conf import settings
 
+def pet_image_path(instance, filename):
+    extension = Path(filename).suffix.lower()
+
+    return f"pets/{uuid.uuid4().hex}{extension}"
 
 class Pet(models.Model):
 

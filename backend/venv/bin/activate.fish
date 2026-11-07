@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/mac/Documents/Ostad/Django Part /pet-adoption-rescue-platform-drf/backend/venv"
+set -gx VIRTUAL_ENV "/Users/mac/Documents/AAAAAAA/pet-adoption-rescue-platform-drf/backend/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
