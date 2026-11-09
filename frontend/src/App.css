@@ -213,6 +213,10 @@
   border-color: var(--purple);
   transform: translateY(-3px);
 }
+.category-item.active {
+  border-color: var(--purple);
+  transform: translateY(-3px);
+}
 
 .category-icon {
   display: grid;

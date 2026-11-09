@@ -788,7 +788,31 @@ const handleAdoptionSubmit = async (event) => {
 
           <div className="category-list">
             {categories.map((category) => (
-              <button onClick={() => setAnimalType(animalType === category.type ? '' : category.type )} className="category-item" key={category.name}>
+              <button onClick={() => {
+                if (category.type === 'All') {
+                  setAnimalType('');
+                } else {
+                  setAnimalType(
+                    animalType === category.type ? '' : category.type
+                  );
+                }
+              }} className="category-item" key={category.name} style={{
+                    borderColor:
+                      (category.type === 'All' && animalType === '') ||
+                      animalType === category.type
+                        ? 'var(--purple)'
+                        : '',
+                    backgroundColor:
+                      (category.type === 'All' && animalType === '') ||
+                      animalType === category.type
+                        ? 'var(--purple)'
+                        : '',
+                    color:
+                      (category.type === 'All' && animalType === '') ||
+                      animalType === category.type
+                        ? 'white'
+                        : '',
+                  }}>
                 <span className="category-icon">
                   <img src={category.image} alt="" />
                 </span>
