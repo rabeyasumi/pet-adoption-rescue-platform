@@ -1,2 +1,23 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Mac
 .DS_Store
 **/.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Django
+*.sqlite3
+media/
+staticfiles/
+
+# React
+node_modules/
+dist/
