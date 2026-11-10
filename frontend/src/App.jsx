@@ -1,6 +1,7 @@
 import './App.css'
 import './index.css'
 import aboutInfo from './data/aboutInfo'
+import { API_BASE_URL } from './api';
 
 import {
   getPets,
@@ -145,7 +146,7 @@ const [adoptionRequestsError, setAdoptionRequestsError] = useState('');
 
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/pets/statistics/')
+    fetch(`${API_BASE_URL}/pets/statistics/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Could not load pet statistics')
